@@ -3016,6 +3016,35 @@ void test_FreeRTOS_round_up( void )
 }
 
 /**
+ * @brief Round large values correctly when the next multiple still fits.
+ */
+void test_FreeRTOS_round_up_LargeRepresentableResults( void )
+{
+    TEST_ASSERT_EQUAL_UINT32( UINT32_MAX, FreeRTOS_round_up( UINT32_MAX - 1U, 3U ) );
+    TEST_ASSERT_EQUAL_UINT32( UINT32_MAX, FreeRTOS_round_up( UINT32_MAX, 3U ) );
+    TEST_ASSERT_EQUAL_UINT32( UINT32_MAX, FreeRTOS_round_up( UINT32_MAX, UINT32_MAX ) );
+    TEST_ASSERT_EQUAL_UINT32( UINT32_MAX, FreeRTOS_round_up( 5U, UINT32_MAX ) );
+    TEST_ASSERT_EQUAL_UINT32( UINT32_MAX, FreeRTOS_round_up( UINT32_MAX - 1U, UINT32_MAX ) );
+    TEST_ASSERT_EQUAL_UINT32( UINT32_MAX, FreeRTOS_round_up( UINT32_MAX, 1U ) );
+    TEST_ASSERT_EQUAL_UINT32( UINT32_MAX - 1U, FreeRTOS_round_up( UINT32_MAX - 1U, 2U ) );
+    TEST_ASSERT_EQUAL_UINT32( UINT32_MAX - 1U, FreeRTOS_round_up( UINT32_MAX - 2U, 2U ) );
+    TEST_ASSERT_EQUAL_UINT32( UINT32_MAX - 3U, FreeRTOS_round_up( UINT32_MAX - 4U, 4U ) );
+    TEST_ASSERT_EQUAL_UINT32( 0U, FreeRTOS_round_up( 0U, UINT32_MAX ) );
+    TEST_ASSERT_EQUAL_UINT32( 0U, FreeRTOS_round_up( 0U, 1U ) );
+}
+
+/**
+ * @brief Verify the chosen zero fallback when the rounded result cannot fit in uint32_t.
+ */
+void test_FreeRTOS_round_up_UnrepresentableResults( void )
+{
+    TEST_ASSERT_EQUAL_UINT32( 0U, FreeRTOS_round_up( UINT32_MAX, 2U ) );
+    TEST_ASSERT_EQUAL_UINT32( 0U, FreeRTOS_round_up( UINT32_MAX - 1U, 4U ) );
+    TEST_ASSERT_EQUAL_UINT32( 0U, FreeRTOS_round_up( UINT32_MAX, UINT32_MAX - 1U ) );
+    TEST_ASSERT_EQUAL_UINT32( 0U, FreeRTOS_round_up( 0x80000001U, 0x80000000U ) );
+}
+
+/**
  * @brief test_FreeRTOS_round_down
  * To validate FreeRTOS_round_down.
  */

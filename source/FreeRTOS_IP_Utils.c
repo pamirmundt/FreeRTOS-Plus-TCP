@@ -1786,9 +1786,10 @@ int32_t FreeRTOS_multiply_int32( int32_t a,
 
 /**
  * @brief Round-up a number to a multiple of 'd'.
- * @param[in] a the first value.
- * @param[in] d the second value.
- * @return A multiple of d.
+ * @param[in] a the number to round up.
+ * @param[in] d the nonzero multiple to round up to.
+ * @return The smallest multiple of d greater than or equal to a,
+ *         with zero used as a fallback if the result cannot fit in uint32_t.
  */
 uint32_t FreeRTOS_round_up( uint32_t a,
                             uint32_t d )
@@ -1799,7 +1800,22 @@ uint32_t FreeRTOS_round_up( uint32_t a,
 
     if( d != 0U )
     {
-        ulResult = d * ( ( a + d - 1U ) / d );
+        const uint32_t ulRemainder = a % d;
+
+        if( ulRemainder != 0U )
+        {
+            const uint32_t ulIncrement = d - ulRemainder;
+
+            if( ulIncrement <= ( UINT32_MAX - a ) )
+            {
+                ulResult = a + ulIncrement;
+            }
+            else
+            {
+                /* The rounded result cannot be represented by uint32_t. */
+                ulResult = 0U;
+            }
+        }
     }
 
     return ulResult;
